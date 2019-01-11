@@ -16,20 +16,44 @@ namespace Gingami
 {
     public partial class Form1 : Form
     {
+        /// <summary>
+        /// This is the backbuffer. We draw onto this first, then paint this onto the form.
+        /// </summary>
         private Bitmap _backbuffer;
 
+        /// <summary>
+        /// This is the graphics for interacting with the backbuffer.
+        /// </summary>
         private Graphics _graphics;
 
+        /// <summary>
+        /// This is the actual drawing surface of the form we copy our backbuffer onto.
+        /// </summary>
         private Graphics _surface;
 
+        /// <summary>
+        /// Set to true to enable antialiasing (set in form constructor).
+        /// </summary>
         private bool _antialiasing;
 
+        /// <summary>
+        /// The size of the viewport (set in form constructor).
+        /// </summary>
         private Size _displaySize;
 
+        /// <summary>
+        /// The background thread that handles rendering.
+        /// </summary>
         private Thread _renderThread;
         
+        /// <summary>
+        /// The paint event that shadows the form's.
+        /// </summary>
         public new event PaintEventHandler Paint;
 
+        /// <summary>
+        /// The paint event handler that shadows the form's.
+        /// </summary>
         public delegate void PaintEventHandler(Graphics g);
 
         // TODO: Example code. Tracks ball count, position, size and x/y velocity.
@@ -85,6 +109,9 @@ namespace Gingami
             SetStyle(ControlStyles.UserPaint, false);            
         }
 
+        /// <summary>
+        /// Contains the main game loop.
+        /// </summary>
         private void GameLoop()
         {
             // TODO: Example code. Initial randomisation of balls. 
@@ -161,6 +188,7 @@ namespace Gingami
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            // Start thread with game loop in it.
             _renderThread = new Thread(GameLoop);
             if (!_renderThread.TrySetApartmentState(ApartmentState.MTA))
             {
