@@ -4,4 +4,4 @@ GDI+ is not game middleware! But let's try to use it as something like that anyw
 ![preview.gif](preview.gif)
 
 ## Acknowledgements
-This whole thing is based very (very, very) heavily on [this VB.NET article](https://www.codeproject.com/Articles/409988/%2FArticles%2F409988%2FBeginners-Starting-a-2D-Game-with-GDIplus) over on CodeProject.
+The core of this thing is heavily informed by [this VB.NET article](https://www.codeproject.com/Articles/409988/%2FArticles%2F409988%2FBeginners-Starting-a-2D-Game-with-GDIplus) over on CodeProject.
