@@ -1,13 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Drawing.Text;
 using System.Drawing.Drawing2D;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Threading;
 using System.Diagnostics;
@@ -19,33 +14,38 @@ namespace Gingami
         /// <summary>
         /// This is the backbuffer. We draw onto this first, then paint this onto the form.
         /// </summary>
-        private Bitmap _backbuffer;
+        private readonly Bitmap _backbuffer;
 
         /// <summary>
         /// This is the graphics for interacting with the backbuffer.
         /// </summary>
-        private Graphics _graphics;
+        private readonly Graphics _graphics;
 
         /// <summary>
         /// This is the actual drawing surface of the form we copy our backbuffer onto.
         /// </summary>
-        private Graphics _surface;
+        private readonly Graphics _surface;
 
         /// <summary>
         /// Set to true to enable antialiasing (set in form constructor).
         /// </summary>
-        private bool _antialiasing;
+        private readonly bool _antialiasing;
 
         /// <summary>
         /// The size of the viewport (set in form constructor).
         /// </summary>
-        private Size _displaySize;
+        private readonly Size _displaySize;
 
         /// <summary>
         /// The background thread that handles rendering.
         /// </summary>
         private Thread _renderThread;
-        
+
+        /// <summary>
+        /// Whether or not to show the frames per second counter.
+        /// </summary>
+        private readonly bool _showFps;
+
         /// <summary>
         /// The paint event that shadows the form's.
         /// </summary>
@@ -55,6 +55,11 @@ namespace Gingami
         /// The paint event handler that shadows the form's.
         /// </summary>
         public delegate void PaintEventHandler(Graphics g);
+
+        /// <summary>
+        /// Holds ticks for the frames per second counter.
+        /// </summary>
+        private readonly Queue<long> _fpsTicks;
 
         // TODO: Example code. Tracks ball count, position, size and x/y velocity.
         private int _ballCount;
@@ -68,6 +73,10 @@ namespace Gingami
         public Form1()
         {
             InitializeComponent();
+
+            // Initialize queue for the frames per second counter.
+            _showFps = true;
+            _fpsTicks = new Queue<long>();
 
             // Set some configuration options, including the size of the viewport and antialiasing setting.
             _displaySize = new Size(800, 600);
@@ -123,7 +132,7 @@ namespace Gingami
             _dx = new int[_ballCount];
             _dy = new int[_ballCount];
             var r = new Random();
-            for (int i = 0; i < _ballCount; i++)
+            for (var i = 0; i < _ballCount; i++)
             {
                 _w[i] = r.Next(10, 100);
                 _h[i] = _w[i];
@@ -169,6 +178,13 @@ namespace Gingami
                         }
                     }
                     
+                    // Keep frames per second counter up-to-date.
+                    _fpsTicks.Enqueue(DateTime.Now.Ticks);
+                    while (DateTime.Now.Ticks - 10000000 > _fpsTicks.Peek())
+                    {
+                        _fpsTicks.Dequeue();
+                    }
+
                     // Raise paint event (and draw buffered image all at once.
                     Paint(_graphics);
                     _surface.DrawImageUnscaled(_backbuffer, 0, 0);
@@ -199,13 +215,17 @@ namespace Gingami
 
         private void Form1_Paint(Graphics g)
         {
-            // TODO: This entire method is just example code.
-
-            // Draw balls.
+            // TODO: Example code. Draw balls.
             g.Clear(Color.DeepSkyBlue);
-            for (int i = 0; i < _ballCount; i++)
+            for (var i = 0; i < _ballCount; i++)
             {
                 g.FillEllipse(Brushes.AliceBlue, _x[i], _y[i], _w[i], _h[i]);
+            }
+
+            // Draw frames per second.
+            if (_showFps)
+            {
+                g.DrawString(_fpsTicks.Count.ToString(), new Font("Consolas", 48), new SolidBrush(Color.FromArgb(128, Color.Black)), 0, 0);
             }
         }
     }
